@@ -14,5 +14,5 @@ export default {
 
 //测试修改
 <style>
-  @import "./assets/css/base.css";
+  @import "assets/css/base.css";
 </style>
