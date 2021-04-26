@@ -6,7 +6,8 @@
     <home-swiper :banners="banner"></home-swiper>
     <home-recommend-view :recommends="recommend"></home-recommend-view>
     <home-feature-view></home-feature-view>
-    <tab-control class="tabControl" :titles="['流行','新款','精选']"></tab-control>
+    <tab-control class="tabControl" :titles="['流行','新款','精选']" @tabClick="tabClick"></tab-control>
+    <goods-list :goodsList="showGoods "></goods-list>
     <ul>
       <li>列表</li>
       <li>列表</li>
@@ -118,6 +119,7 @@ import NavBar from "components/common/navbar/NavBar";
 import HomeSwiper from "./homeComps/HomeSwiper";
 import HomeRecommendView from "./homeComps/HomeRecommendView";
 import HomeFeatureView from "./homeComps/HomeFeatureView";
+import GoodsList from "components/content/goods/GoodsList";
 import TabControl from "components/content/tabControl/TabControl";
 
 import {getHomeMultidata,getHomeGoods} from "network/home";
@@ -131,6 +133,7 @@ export default {
     HomeRecommendView,
     HomeFeatureView,
     TabControl,
+    GoodsList,
     NavBar,
 
   },
@@ -142,7 +145,13 @@ export default {
         'pop':{page:0,list:[]},
         'new':{page:0,list:[]},
         'sell':{page:0,list:[]}
-      }
+      },
+      currentType:'pop',
+    }
+  },
+  computed:{
+    showGoods(){
+      return this.goods[this.currentType].list
     }
   },
   created() {
@@ -152,6 +161,27 @@ export default {
     this.getHomeGoods('sell');
   },
   methods:{
+    /***
+     * 事件监听相关方法
+     */
+    tabClick(index){
+      console.log('点击了',index);
+      switch (index) {
+        case 0:
+          this.currentType = 'pop';
+          break;
+        case 1:
+          this.currentType = 'new';
+          break;
+        case 2:
+          this.currentType = 'sell';
+          break
+      }
+    },
+
+    /**
+     * 网络请求相关的方法
+     */
     getHomeMultidata(){
       //请求主页数据
       getHomeMultidata().then(res => {
@@ -184,6 +214,7 @@ export default {
     color: #fff;
   }
   .tabControl{
+    z-index: 9;
     position: sticky;
     top: 44px;
   }
