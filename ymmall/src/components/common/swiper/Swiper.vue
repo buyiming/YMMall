@@ -114,7 +114,6 @@ export default {
       //1. 获取要操作的元素
       let swiperEl = document.querySelector('.swiper');
       let slidesEls = swiperEl.getElementsByClassName('slide');
-      console.log(slidesEls.length);
       //2. 保存个数
       this.slideCount = slidesEls.length;
       //3. 如果大于1个，那么在前后分别添加一个slide
