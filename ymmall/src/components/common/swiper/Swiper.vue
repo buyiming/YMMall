@@ -166,7 +166,6 @@ export default {
       this.currentX = e.touches[0].pageX;
       this.distance = this.currentX - this.startX;
       let currentPosition = -this.currentIndex * this.totalWidth
-      console.log(currentPosition);
       let moveDistance = this.distance + currentPosition;
       //2. 设置当前的位置
       this.setTransform(moveDistance);

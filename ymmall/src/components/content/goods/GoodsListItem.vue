@@ -25,9 +25,12 @@ export default {
 
 <style scoped>
   .goods-item{
+    margin-bottom: 10px;
     padding-bottom: 40px;
     position: relative;
     width: 48%;
+    box-shadow: 3px 3px 3px rgba(192,192,192,0.3);
+    border-radius: 5px;
   }
   .goods-item img{
     width: 100%;
