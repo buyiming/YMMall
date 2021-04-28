@@ -3,11 +3,18 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-    <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll">
-      <home-swiper :banners="banner"></home-swiper>
+    <tab-control
+        class="tabControl"
+        :titles="['流行','新款','精选']"
+        @tabClick="tabClick"
+        v-show="isTopTabControlShow"
+        ref="tabcontrolTop">
+    </tab-control>
+    <scroll class="content" ref="scroll" :probe-type="3" :pullUpload="true" @scroll="contentScroll" @pullingUp="loadMore">
+      <home-swiper :banners="banner" @swiperImageLoad="swiperImageLoad"></home-swiper>
       <home-recommend-view :recommends="recommend"></home-recommend-view>
       <home-feature-view></home-feature-view>
-      <tab-control class="tabControl" :titles="['流行','新款','精选']" @tabClick="tabClick"></tab-control>
+      <tab-control :titles="['流行','新款','精选']" @tabClick="tabClick" ref="tabcontrolBottom"></tab-control>
       <goods-list :goodsList="showGoods "></goods-list>
     </scroll>
     <back-top @click.native="backClick" v-show="isShow"/>
@@ -53,6 +60,9 @@ export default {
       currentType:'pop',
       //返回顶部按钮是否显示
       isShow:false,
+      tabOffsetTop:0,
+      //顶部吸顶tabcontrol显示
+      isTopTabControlShow:false,
     }
   },
   computed:{
@@ -61,17 +71,44 @@ export default {
     }
   },
   created() {
+    //请求主页数据
     this.getHomeMultidata();
+    //请求分栏数据
     this.getHomeGoods('pop');
     this.getHomeGoods('new');
     this.getHomeGoods('sell');
+
+  },
+  mounted() {
+    const refresh = this.debonce(this.$refs.scroll.refresh,200)
+    //监听图片加载完成
+    this.$bus.$on('itemImageLoad', () => {
+      refresh();
+    })
   },
   methods:{
     /***
      * 事件监听相关方法
      */
+
+    //轮播图 图片加载完成
+    swiperImageLoad(){
+      this.tabOffsetTop = this.$refs.tabcontrolBottom.$el.offsetTop;
+    },
+
+    //防抖函数 图片加载完成
+    debonce(func,delay){
+      let timer = null;
+      return function (...args) {
+        if(timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          func.apply(this,args);
+        },delay)
+      }
+    },
+
+    //切换tabbar
     tabClick(index){
-      console.log('点击了',index);
       switch (index) {
         case 0:
           this.currentType = 'pop';
@@ -83,18 +120,25 @@ export default {
           this.currentType = 'sell';
           break
       }
+      this.$refs.tabcontrolTop.currentIndex = index;
+      this.$refs.tabcontrolBottom.currentIndex = index;
     },
     //返回顶部按钮点击
     backClick(){
-      console.log('backClick');
       this.$refs.scroll.scrollTo(0,0)
     },
     //滚动事件
     contentScroll(position){
-      console.log(position.y);
-      this.isShow = position.y < -1000
-    },
+      this.isShow = position.y < -1000;
 
+      //tabControl是否吸顶
+      this.isTopTabControlShow = position.y < -this.tabOffsetTop;
+    },
+    //上拉加载更多
+    loadMore(){
+      //针对当前类型，加载更多数据
+      this.getHomeGoods(this.currentType);
+    },
     /**
      * 网络请求相关的方法
      */
@@ -110,6 +154,7 @@ export default {
       getHomeGoods(type,page).then(res => {
         this.goods[type].list.push(...res.data.list);
         this.goods[type].page = page;
+        this.$refs.scroll.finishPullUp();
       })
     }
   }
@@ -131,11 +176,6 @@ export default {
     background-color: var(--color-tint);
     color: #fff;
   }
-  .tabControl{
-    z-index: 9;
-    position: sticky;
-    top: 44px;
-  }
   .content{
     position: absolute;
     top: 44px;
@@ -143,5 +183,11 @@ export default {
     left: 0;
     right: 0;
   }
-
+  .tabControl{
+    position: fixed;
+    z-index: 11;
+    top: 44px;
+    left: 0;
+    right: 0;
+  }
 </style>

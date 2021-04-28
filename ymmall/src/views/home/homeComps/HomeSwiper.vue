@@ -2,7 +2,7 @@
   <swiper>
     <swiper-item v-for="(item,id) in banners" :key="id">
       <a :href="item.link">
-        <img :src="item.image">
+        <img :src="item.image" @load="swiperImageLoad">
       </a>
     </swiper-item>
   </swiper>
@@ -21,6 +21,19 @@ export default {
       type:Array,
       default(){
         return []
+      }
+    }
+  },
+  data(){
+    return{
+      isFirst:true,
+    }
+  },
+  methods:{
+    swiperImageLoad(){
+      if(this.isFirst){
+        this.$emit('swiperImageLoad')
+        this.isFirst = false;
       }
     }
   }
