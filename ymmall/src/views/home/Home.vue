@@ -63,6 +63,8 @@ export default {
       tabOffsetTop:0,
       //顶部吸顶tabcontrol显示
       isTopTabControlShow:false,
+      //记录当前滚动的Y值
+      scrollY:0,
     }
   },
   computed:{
@@ -85,6 +87,14 @@ export default {
     this.$bus.$on('itemImageLoad', () => {
       refresh();
     })
+  },
+  activated() {
+    this.$refs.scroll.refresh();
+    this.$refs.scroll.scrollTo(0,this.scrollY,0);
+
+  },
+  deactivated() {
+    this.scrollY = this.$refs.scroll.scroll.y;
   },
   methods:{
     /***
