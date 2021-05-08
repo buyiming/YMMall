@@ -1,6 +1,6 @@
 <template>
   <div class="goods">
-    <goods-list-item v-for="item in goodsList" :goods="item"></goods-list-item>
+    <goods-list-item v-for="item in goodsList" :goods="item" :flag="flag"></goods-list-item>
   </div>
 </template>
 
@@ -18,6 +18,12 @@ export default {
       type:Array,
       default(){
         return []
+      }
+    },
+    flag:{
+      type:Number,
+      default() {
+        return 0;
       }
     }
   }
