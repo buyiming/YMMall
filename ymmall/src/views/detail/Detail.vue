@@ -1,15 +1,17 @@
 <template>
   <div class="product-detail">
-    <detail-nav-bar class="detail-nav-bar"></detail-nav-bar>
-    <scroll :probeType="3" ref="scroll" class="content">
+    <detail-nav-bar class="detail-nav-bar" @titleClick="titleClick" ref="detailnav"></detail-nav-bar>
+    <scroll :probeType="3" ref="scroll" class="content" @scroll="contentScroll">
       <detail-swiper :topimg="topImages"></detail-swiper>
       <detail-base-info :goods="goods"></detail-base-info>
       <detail-shop-info :shop="shops"></detail-shop-info>
-      <detail-images-info :imagesInfo="images"></detail-images-info>
-      <detail-param-info :detailParams="goodsParams"></detail-param-info>
-      <detail-comment-info :commentsInfo="comments"></detail-comment-info>
-      <goods-list :goodsList="recommondList" :flag="1" class="goodslist"></goods-list>
+      <detail-images-info @imgLoad="imgLoad" :imagesInfo="images"></detail-images-info>
+      <detail-param-info ref="params" :detailParams="goodsParams"></detail-param-info>
+      <detail-comment-info ref="comment" :commentsInfo="comments"></detail-comment-info>
+      <goods-list ref="recommond" :goodsList="recommondList" :flag="1" class="goodslist"></goods-list>
     </scroll>
+    <back-top @click.native="backClick" v-show="isShow"/>
+    <detail-bottom-bar></detail-bottom-bar>
   </div>
 </template>
 
@@ -22,7 +24,9 @@ import DetailShopInfo from "./childComps/DetailShopInfo";
 import DetailImagesInfo from "./childComps/DetailImagesInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
+import DetailBottomBar from "./childComps/DetailBottomBar";
 import GoodsList from "components/content/goods/GoodsList";
+import BackTop from "components/content/backTop/BackTop";
 import Scroll from "components/common/scroll/Scroll";
 
 import {getDetail,getRecommond,Goods,Shop,GoodsParams} from "network/detail";
@@ -39,6 +43,10 @@ export default {
       goodsParams:{},
       comments:{},
       recommondList:[],
+      //返回顶部按钮是否显示
+      isShow:false,
+      themeTopys:[],
+      currentIndex:0,
     }
   },
   created() {
@@ -69,9 +77,46 @@ export default {
     });
     //请求相关数据
     getRecommond().then(res => {
-      console.log(res);
       this.recommondList = res.data.list;
     })
+  },
+  methods:{
+    //scroll组件滚动
+    contentScroll(position){
+      //是否显示backTop组件
+      this.isShow = position.y < -1000;
+
+      //1.获取屏幕滚动Y值
+      const positionY = -position.y;
+      //2.和themeTopys 数组中的值比较
+      let length = this.themeTopys.length;
+      for (let i=0;i<length;i++) {
+        if ((i < length - 1 && positionY >= this.themeTopys[i] && positionY < this.themeTopys[i + 1]) || (i == length - 1 && positionY >= this.themeTopys[i])){
+          this.currentIndex = i;
+          this.$refs.detailnav.currentIndex = this.currentIndex;
+        }
+      }
+    },
+    //返回顶部按钮点击
+    backClick(){
+      this.$refs.scroll.scrollTo(0,0)
+    },
+    //顶部导航按钮点击
+    titleClick(index){
+      this.$refs.scroll.scrollTo(0,-this.themeTopys[index],300);
+    },
+    //推荐图片加载完
+    imgLoad(){
+      this.$refs.scroll.refresh();
+      this.$nextTick(() => {
+        this.themeTopys = [];
+        this.themeTopys.push(0);
+        this.themeTopys.push(this.$refs.params.$el.offsetTop);
+        this.themeTopys.push(this.$refs.comment.$el.offsetTop);
+        this.themeTopys.push(this.$refs.recommond.$el.offsetTop);
+        console.log(this.themeTopys);
+      })
+    }
   },
   components:{
     DetailSwiper,
@@ -81,7 +126,9 @@ export default {
     DetailImagesInfo,
     DetailParamInfo,
     DetailCommentInfo,
+    DetailBottomBar,
     GoodsList,
+    BackTop,
     Scroll,
   }
 }
@@ -89,8 +136,10 @@ export default {
 
 <style scoped>
   .product-detail{
-    width: 100%;
-    height: 100%;
+    height: 100vh;
+    background-color: #fff;
+    position: relative;
+    z-index: 1;
   }
   .content{
     position: absolute;
@@ -98,6 +147,9 @@ export default {
     bottom: 49px;
     left: 0;
     right: 0;
+    overflow: hidden;
+    width: 100%;
+    background-color: #fff;
   }
   .detail-nav-bar{
     position: fixed;

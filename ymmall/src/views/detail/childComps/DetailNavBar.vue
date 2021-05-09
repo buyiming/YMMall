@@ -29,7 +29,9 @@ export default {
   },
   methods:{
     itemClick(index){
+      //导航栏按钮点击事件
       this.currentIndex = index;
+      this.$emit('titleClick',index);
     },
     backClick(){
       this.$router.back()
