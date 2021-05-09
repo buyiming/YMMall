@@ -11,7 +11,7 @@
       <goods-list ref="recommond" :goodsList="recommondList" :flag="1" class="goodslist"></goods-list>
     </scroll>
     <back-top @click.native="backClick" v-show="isShow"/>
-    <detail-bottom-bar></detail-bottom-bar>
+    <detail-bottom-bar @addCart="addToCart"></detail-bottom-bar>
   </div>
 </template>
 
@@ -114,8 +114,21 @@ export default {
         this.themeTopys.push(this.$refs.params.$el.offsetTop);
         this.themeTopys.push(this.$refs.comment.$el.offsetTop);
         this.themeTopys.push(this.$refs.recommond.$el.offsetTop);
-        console.log(this.themeTopys);
       })
+    },
+    //添加到购物车
+    addToCart(){
+      //1.获取商品信息
+      const product = {};
+      product.image = this.topImages[0];
+      product.title = this.goods.title;
+      product.desc = this.goods.desc;
+      product.price = this.goods.nowPrice;
+      product.iid = this.iid;
+      product.checked = false;
+
+      //2.将商品放入购物车
+      this.$store.dispatch('addCart',product);
     }
   },
   components:{

@@ -14,13 +14,16 @@
           :text="isShouCang ? '已收藏' : '收藏'"
           @click="starClick"
       />
-      <van-goods-action-button @click="addToCart" text="加入购物车" type="warning" />
-      <van-goods-action-button @click="$router.push('/cart')" text="立即购买" type="danger" />
+      <van-goods-action-button @click="addToCart" color="#be99ff" text="加入购物车" type="warning" />
+      <van-goods-action-button @click="$router.push('/cart')" color="#7232dd" text="立即购买" type="danger" />
     </van-goods-action>
   </div>
 </template>
 
 <script>
+
+import { mapGetters } from "vuex"
+
 export default {
   name: "DetailBottomBar",
   data(){
@@ -31,7 +34,6 @@ export default {
   methods:{
     //点击收藏
     starClick(){
-      console.log('点击收藏');
       if(!this.isShouCang){
         this.$toast("收藏成功")
         this.isShouCang = true;
@@ -42,8 +44,15 @@ export default {
     },
     //点击添加购物车
     addToCart(){
-
+      this.$toast("添加购物车")
+      this.$emit('addCart')
     }
+  },
+  computed:{
+    // 对象写法可以自己命名
+    ...mapGetters({
+      cartLength: "cartLength"
+    })
   }
 }
 </script>
