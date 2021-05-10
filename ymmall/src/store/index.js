@@ -9,7 +9,9 @@ import getters from "./getters";
 Vue.use(Vuex);
 
 const state = {
-    cartList:[]
+    cartList:[],
+    //是否开始请求
+    isLoading: true,
 }
 
 //2.创建Store对象

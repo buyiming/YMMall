@@ -75,7 +75,6 @@ export default {
     }
   },
   activated() {
-    console.log('activated');
     // 刷新better-scroll
     this.$refs.scroll.refresh();
     let result = this.cartList.filter(item => item.checked);

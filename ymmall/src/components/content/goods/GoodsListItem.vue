@@ -31,8 +31,10 @@ export default {
       this.$bus.$emit('itemImageLoad')
     },
     showImage(){
-      if(this.flag != 0){
+      if(this.flag === 1){
         return this.goods.image;
+      }else if(this.flag == 2){
+        return this.goods.img;
       }else{
         return this.goods.show.img;
       }
